@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="buttons">
+        <a href="card_flip/index.html" class="circle-btn">
+          <img src="mistic.png" alt="Page 1" />
+        </a>
+        <a href="kliker/index.html" class="circle-btn">
+          <img src="cake-slice.png" alt="Page 2" />
+        </a>
+      </div>
+    </div>
+    <div id="overlay">
+      <img id="flash1" src="max_verstappen.jpg" alt="" />
+      <img id="flash2" src="max_verstappen_face.jpg" alt="" />
+
+      <video id="overlayVideo" src="tu_du_du_du_max_verstappen.mp4"></video>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const img1 = document.getElementById("flash1");
+        const img2 = document.getElementById("flash2");
+        const video = document.getElementById("overlayVideo");
+
+        setTimeout(() => {
+          img1.style.display = "block";
+
+          setTimeout(() => {
+            img1.style.display = "none";
+          }, 100);
+        }, 5000);
+
+        setTimeout(() => {
+          img2.style.display = "block";
+
+          setTimeout(() => {
+            img2.style.display = "none";
+          }, 100);
+        }, 10000);
+
+        setTimeout(() => {
+          video.style.display = "block";
+          video.play();
+
+          video.onended = () => {
+            video.style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+          };
+        }, 15000);
+      });
+    </script>
+  </body>
+</html>

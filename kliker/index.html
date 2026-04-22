@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Kliker</title>
+  </head>
+  <body>
+    <div class="screen visible">
+      <h2>The ‘Have a Sweet’ Game</h2>
+      <button type="button" class="btn" id="start-btn">Start Game</button>
+      <a href="../index.html" class="back-btn">Back Home</a>
+    </div>
+
+    <div class="screen">
+      <h2>Choose your favourite treat</h2>
+      <ul class="sweets-list">
+        <li>
+          <button type="button" class="choose-sweet-btn">
+            <p>Donut</p>
+            <img src="./assets/donut.png" alt="donut" />
+          </button>
+        </li>
+        <li>
+          <button type="button" class="choose-sweet-btn">
+            <p>Cupcake</p>
+            <img src="./assets/cupcake.png" alt="cupcake" />
+          </button>
+        </li>
+        <li>
+          <button type="button" class="choose-sweet-btn">
+            <p>Cake</p>
+            <img src="./assets/cake-slice.png" alt="cake-slice" />
+          </button>
+        </li>
+        <li>
+          <button type="button" class="choose-sweet-btn">
+            <p>Candy</p>
+            <img src="./assets/candy.png" alt="candy" />
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="screen game-container" id="game-container">
+      <h3 id="time" class="time">Time: 00</h3>
+      <h3 id="score" class="score">Score: 0</h3>
+      <h5 id="message" class="message">
+        Isn't that enough? <br />
+        You ate a lot of sweets.
+        <a href="../index.html" class="back-btn">Back Home</a>
+      </h5>
+    </div>
+
+    <audio id="bite" src="./assets/bite.mp3"></audio>
+    <script src="script.js"></script>
+  </body>
+</html>
