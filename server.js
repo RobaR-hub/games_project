@@ -1,66 +1,55 @@
 const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
+const Database = require("better-sqlite3");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
-const db = new sqlite3.Database("game.db");
+const db = new Database("game.db");
 
-db.run(`
+db.prepare(
+  `
   CREATE TABLE IF NOT EXISTS scores (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
+    name TEXT UNIQUE,
     score INTEGER
   )
-`);
+`,
+).run();
 
 app.post("/save", (req, res) => {
   const { name, score } = req.body;
 
-  db.get("SELECT * FROM scores WHERE name = ?", [name], (err, row) => {
-    if (err) return res.status(500).send(err);
+  const row = db.prepare("SELECT * FROM scores WHERE name = ?").get(name);
 
-    if (!row) {
-      // если такого имени нет → создаём
-      db.run(
-        "INSERT INTO scores (name, score) VALUES (?, ?)",
-        [name, score],
-        (err) => {
-          if (err) return res.status(500).send(err);
-          res.send("New player saved");
-        },
-      );
-    } else {
-      // если есть → проверяем счёт
-      if (score > row.score) {
-        db.run(
-          "UPDATE scores SET score = ? WHERE name = ?",
-          [score, name],
-          (err) => {
-            if (err) return res.status(500).send(err);
-            res.send("Score updated");
-          },
-        );
-      } else {
-        res.send("Score not improved");
-      }
-    }
-  });
+  if (!row) {
+    db.prepare("INSERT INTO scores (name, score) VALUES (?, ?)").run(
+      name,
+      score,
+    );
+    return res.send("New player");
+  }
+
+  if (score > row.score) {
+    db.prepare("UPDATE scores SET score = ? WHERE name = ?").run(score, name);
+    return res.send("Updated");
+  }
+
+  res.send("Not improved");
 });
 
 app.get("/scores", (req, res) => {
-  db.all(
-    "SELECT * FROM scores ORDER BY score DESC LIMIT 10",
-    [],
-    (err, rows) => {
-      if (err) return res.status(500).send(err);
-      res.json(rows);
-    },
-  );
+  const rows = db
+    .prepare("SELECT * FROM scores ORDER BY score DESC LIMIT 10")
+    .all();
+
+  res.json(rows);
 });
 
-app.listen(3000, () => {
-  console.log("Server started on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Server running");
 });
