@@ -9,8 +9,21 @@ const message = document.getElementById("message");
 let seconds = 0;
 let score = 0;
 let selectedSweet = {};
+let timerInterval;
+
+let playerName = "";
+const nameInput = document.getElementById("player-name");
+
+let maxTime = 30;
 
 startButton.addEventListener("click", () => {
+  if (nameInput.value.trim() === "") {
+    alert("Enter your name!");
+    return;
+  }
+
+  playerName = nameInput.value;
+
   screens[0].classList.remove("visible");
   screens[1].classList.add("visible");
 });
@@ -22,25 +35,43 @@ chooseSweetBtns.forEach((btn) => {
     const alt = img.getAttribute("alt");
 
     selectedSweet = { src, alt };
+
     screens[1].classList.remove("visible");
     screens[2].classList.add("visible");
 
-    setTimeout(createSweet, 1000);
     startGame();
+    setTimeout(createSweet, 1000);
   });
 });
 
 function startGame() {
-  setInterval(increaseTime, 1000);
+  seconds = 0;
+  score = 0;
+
+  clearInterval(timerInterval);
+
+  scoreEl.innerHTML = "Score: 0";
+  timeEl.innerHTML = `Time: ${maxTime}`;
+
+  const sweets = document.querySelectorAll(".sweet");
+  sweets.forEach((sweet) => sweet.remove());
+
+  timerInterval = setInterval(increaseTime, 1000);
 }
 
 function increaseTime() {
-  let s = seconds % 60;
-
-  s = s < 10 ? `0${s}` : s;
-
-  timeEl.innerHTML = `Time: ${s}`;
   seconds++;
+
+  let remaining = maxTime - seconds;
+
+  if (remaining <= 0) {
+    endGame();
+    return;
+  }
+
+  remaining = remaining < 10 ? `0${remaining}` : remaining;
+
+  timeEl.innerHTML = `Time: ${remaining}`;
 }
 
 function createSweet() {
@@ -50,7 +81,7 @@ function createSweet() {
   sweet.classList.add("sweet");
   sweet.src = selectedSweet.src;
   sweet.alt = selectedSweet.alt;
-  sweet.style.display = "block";
+
   sweet.style.top = `${y}px`;
   sweet.style.left = `${x}px`;
   sweet.style.transform = `rotate(${Math.random() * 360}deg)`;
@@ -72,7 +103,6 @@ function getRandomLocation() {
 
 function playBiteSound() {
   const audio = document.getElementById("bite");
-
   audio.play();
 }
 
@@ -81,7 +111,6 @@ function catchSweet() {
   increaseScore();
 
   this.remove();
-
   addSweets();
 }
 
@@ -99,3 +128,50 @@ function increaseScore() {
 
   scoreEl.innerHTML = `Score: ${score}`;
 }
+
+function endGame() {
+  clearInterval(timerInterval);
+
+  alert(`Game Over! ${playerName}, your score: ${score}`);
+
+  saveResult();
+
+  screens[2].classList.remove("visible");
+  screens[0].classList.add("visible");
+
+  nameInput.value = "";
+
+  loadScores();
+}
+
+function saveResult() {
+  fetch("http://localhost:3000/save", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: playerName,
+      score: score,
+    }),
+  });
+}
+
+function loadScores() {
+  fetch("http://localhost:3000/scores")
+    .then((res) => res.json())
+    .then((data) => {
+      const list = document.getElementById("leaderboard");
+      list.innerHTML = "";
+
+      data.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.innerText = `${index + 1}. ${item.name} — ${item.score}`;
+        list.appendChild(li);
+      });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadScores();
+});
