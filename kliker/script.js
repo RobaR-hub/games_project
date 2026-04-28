@@ -145,7 +145,7 @@ function endGame() {
 }
 
 function saveResult() {
-  fetch("http://localhost:3000/save", {
+  fetch("/save", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -158,7 +158,7 @@ function saveResult() {
 }
 
 function loadScores() {
-  fetch("http://localhost:3000/scores")
+  fetch("/scores")
     .then((res) => res.json())
     .then((data) => {
       const list = document.getElementById("leaderboard");
