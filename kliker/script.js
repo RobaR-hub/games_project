@@ -134,18 +134,18 @@ function endGame() {
 
   alert(`Game Over! ${playerName}, your score: ${score}`);
 
-  saveResult();
+  saveResult().then(() => {
+    loadScores();
+  });
 
   screens[2].classList.remove("visible");
   screens[0].classList.add("visible");
 
   nameInput.value = "";
-
-  loadScores();
 }
 
 function saveResult() {
-  fetch("/save", {
+  return fetch("/save", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
